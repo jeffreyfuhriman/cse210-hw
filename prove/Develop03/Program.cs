@@ -62,7 +62,7 @@ class Reference
 
 class Word
 {
-    public string Text;
+    private string Text;
     public bool IsHidden;
 
     public Word(string text)

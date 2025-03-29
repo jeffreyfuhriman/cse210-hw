@@ -1,0 +1,1 @@
+This contains information explaining anything someone should know to use my project.

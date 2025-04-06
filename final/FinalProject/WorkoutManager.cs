@@ -1,5 +1,6 @@
 using System;
 using System.Dynamic;
+using System.Text.Json;
 
 class WorkoutManager
 {
@@ -23,52 +24,59 @@ class WorkoutManager
     {
         EndTime = DateTime.Now;
         Console.WriteLine($"Workout ended at {EndTime}");
-        GetSummary();
     }
     public void AddExercise(Exercise exercise) 
     {
         ExerciseList.Add(exercise);
         Console.WriteLine($"Exercise added: {exercise.Name}");
     }
-
-    public void SaveWorkout() 
-    {
-        Console.WriteLine("Workout saved!");
-    }
-
-    public void GetSummary() 
-    {
-        Console.WriteLine("Getting workout summary...");
-    }
 }
 
-class UserProfile 
+public class UserProfile 
     {
     public string Name { get; private set; }
     public  int Age { get; private set; }
     public double Weight { get; private set; }
-    private List<WorkoutManager> WorkoutHistory;
+    public UserStats Stats { get; set; }
+    private List<WorkoutSession> WorkoutHistory { get; set; }
 
     public UserProfile(string name, int age, double weight) 
     {
         Name = name;
         Age = age;
         Weight = weight;
-        WorkoutHistory = new List<WorkoutManager>();
+        Stats = new UserStats();
+        WorkoutHistory = new List<WorkoutSession>();
     }
 
-    public void AddWorkout() 
+    public void AddWorkout(WorkoutSession session) 
     {
-        Console.WriteLine("Workout added to history: ");
+        WorkoutHistory.Add(session);
+        Console.WriteLine($"Workout added to {Name}'s history.");
     }
 
     public void ViewStats() 
     {
-        Console.WriteLine("Displaying stats...");
+        Console.WriteLine($"User: {Name}, Age: {Age}, Weight: {Weight} lbs\n");
+    }
+
+    public void ViewWorkoutHistory()
+    {
+        if (WorkoutHistory.Count == 0)
+        {
+            Console.WriteLine("No workouts recorded yet.");
+            return;
+        }
+
+        for (int i = 0; i < WorkoutHistory.Count; i++)
+        {
+            Console.WriteLine($"\nSession {i + 1}:");
+            WorkoutHistory[i].DisplaySession();
+        }
     }
 }
 
-class Exercise 
+public class Exercise 
     {
     public string Name { get; private set; }
     public int Sets { get; private set; }
@@ -82,10 +90,43 @@ class Exercise
         Reps = reps;
         Weight = weight;
     }
+    public void UpdateWeight(double weight)
+{
+    Weight = weight;
+}
+
 
     public void DisplayExercise() 
     {
         Console.WriteLine($"Exercise: {Name}, {Sets} sets x {Reps} reps @ {Weight} lbs");
+    }
+}
+
+public class WorkoutSession
+{
+    public string WorkoutType { get; set; }
+    public List<Exercise> Exercises { get; set; }
+    public DateTime StartTime { get; set; }
+    public DateTime EndTime { get; set; }
+
+    public WorkoutSession(string workoutType, List<Exercise> exercises, DateTime startTime, DateTime endTime)
+    {
+        WorkoutType = workoutType;
+        Exercises = new List<Exercise>(exercises);
+        StartTime = startTime;
+        EndTime = endTime;
+    }
+
+    public void DisplaySession()
+    {
+        Console.WriteLine($"\nWorkout Type: {WorkoutType}");
+        Console.WriteLine($"Start: {StartTime}");
+        Console.WriteLine($"End: {EndTime}");
+        foreach (var ex in Exercises)
+        {
+            ex.DisplayExercise();
+        }
+        Console.WriteLine($"Duration: {(EndTime - StartTime).TotalMinutes:F2} minutes");
     }
 }
 
